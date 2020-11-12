@@ -15,5 +15,14 @@ module.exports = {
     'no-unused-vars': ['error', { args: 'none' }],
     quotes: ['error', 'single'],
     semi: ['error', 'always'],
+    'space-before-function-paren': [
+      'error',
+      {
+        anonymous: 'always',
+        named: 'never',
+        asyncArrow: 'always',
+      },
+    ],
+    'space-before-blocks': ['error', 'always'],
   },
 };
