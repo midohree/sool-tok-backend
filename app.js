@@ -1,4 +1,5 @@
 const express = require('express');
+const mongoose = require('mongoose');
 
 const { port } = require('./configs');
 const initLoaders = require('./loaders');
@@ -10,7 +11,23 @@ initLoaders(app);
 
 app.use('/users', usersRouter);
 
-// TODO: Error Handler
+app.use(function (req, res, next) {
+  const error = new Error('Not Found');
+  error.status = 404;
+  next(error);
+});
+
+app.use(function (err, req, res, next) {
+  console.log(err);
+
+  if (process.env.NODE_ENV === 'production') {
+    if (err instanceof mongoose.Error) err = new Error('Internal Server Error');
+    err.stack = null;
+  }
+
+  res.status(err.status || 500);
+  res.json({ err });
+});
 
 app.listen(port, () => {
   console.log(`Server is running on ${port}`);
