@@ -4,7 +4,7 @@ const { tokenSecretKey } = require('../../configs');
 
 exports.verifyToken = (req, res, next) => {
   const { user_id } = req.params;
-  const token = req.header['jwt-token'];
+  const token = req.headers['jwt-token'];
 
   try {
     const decodedUser = jwt.verify(token, tokenSecretKey);
