@@ -27,6 +27,7 @@ const googleLogin = async (req, res, next) => {
         name: newUser.name,
         photoUrl: newUser.photoUrl,
       }, tokenSecretKey);
+
       return res.status(201).json({ result: 'ok', token, user: newUser });
     }
 
@@ -64,7 +65,36 @@ const tokenLogin = (req, res, next) => {
   }
 };
 
+const logoutUser = async (req, res, next) => {
+  const { user_Id } = req.params;
+
+  try {
+    const currentUser = await User.findById(user_Id);
+
+    currentUser.isOnline = false;
+    await currentUser.save();
+
+    res.status(200).json({ result: 'ok' });
+  } catch (err) {
+    console.log(err);
+    next(err);
+  }
+};
+
+const getFriendList = async (req, res, next) => {
+  const { user_id } = req.params;
+
+  try {
+    const user = await User.findById(user_id);
+    res.status(200).json({ result: 'ok', friendList: user.friendList });
+  } catch (err) {
+    return res.status(403).json({ result: 'error', message: 'Forbbiden' });
+  }
+};
+
 module.exports = {
   googleLogin,
   tokenLogin,
+  getFriendList,
+  logoutUser,
 };
