@@ -86,9 +86,63 @@ const getFriendList = async (req, res, next) => {
 
   try {
     const user = await User.findById(user_id);
+
     res.status(200).json({ result: 'ok', friendList: user.friendList });
   } catch (err) {
     return res.status(403).json({ result: 'error', message: 'Forbbiden' });
+  }
+};
+
+const getFriendRequestList = async (req, res, next) => {
+  const { user_id } = req.params;
+
+  try {
+    const user = await User.findById(user_id).populate('friendRequestList');
+
+    res.status(200).json({ result: 'ok', friendRequestList: user.friendRequestList });
+  } catch (err) {
+    return res.status(403).json({ result: 'error', message: 'Forbbiden' });
+  }
+};
+
+const requestFriend = async (req, res, next) => {
+  const { user_id } = req.params;
+  const targetUserEmail = req.body.email;
+
+  try {
+    const targetUser = await User.findOne({ email: targetUserEmail });
+
+    if (!targetUser) {
+      return res.status(204).json({ result: 'error', message: 'No content' });
+    }
+
+    targetUser.friendRequestList.push(user_id);
+    await targetUser.save();
+
+    res.status(200).json({ result: 'ok', friendRequestList: targetUser.friendRequestList });
+  } catch (err) {
+    next(err);
+  }
+};
+
+const responseFriendRequest = async (req, res, next) => {
+  const { user_id } = req.params;
+  const { action, target_user_id } = req.body;
+
+  try {
+    const user = await User.findById(user_id);
+
+    if (action === 'accept') {
+      user.friendList.push(target_user_id);
+    }
+
+    user.friendRequestList.pull(target_user_id);
+    await user.save();
+    await user.execPopulate('friendRequestList');
+
+    res.status(200).json({ result: 'ok', friendRequestList: user.friendRequestList });
+  } catch (err) {
+    next(err);
   }
 };
 
@@ -97,4 +151,7 @@ module.exports = {
   tokenLogin,
   getFriendList,
   logoutUser,
+  getFriendRequestList,
+  requestFriend,
+  responseFriendRequest,
 };
