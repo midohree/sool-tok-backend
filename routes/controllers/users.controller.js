@@ -64,7 +64,24 @@ const tokenLogin = (req, res, next) => {
   }
 };
 
+const logoutUser = async (req, res, next) => {
+  const { user_Id } = req.params;
+
+  try {
+    const currentUser = await User.findById(user_Id);
+
+    currentUser.isOnline = false;
+    await currentUser.save();
+
+    res.status(200).json({ result: 'ok' });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ result: 'error', message: err.message });
+  }
+};
+
 module.exports = {
   googleLogin,
   tokenLogin,
+  logoutUser,
 };
