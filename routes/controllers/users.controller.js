@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken');
 const { tokenSecretKey } = require('../../configs');
 const User = require('../../models/User');
 
-const postLogin = async (req, res, next) => {
+const loginUser = async (req, res, next) => {
   const user = req.body;
   const { email, name, photoUrl } = user;
 
@@ -37,5 +37,5 @@ const postLogin = async (req, res, next) => {
 };
 
 module.exports = {
-  postLogin,
+  loginUser,
 };
