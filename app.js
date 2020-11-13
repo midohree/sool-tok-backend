@@ -29,6 +29,9 @@ app.use(function (err, req, res, next) {
   res.json({ err });
 });
 
-app.listen(port, () => {
+const server = app.listen(port || 8080, () => {
   console.log(`Server is running on ${port}`);
 });
+
+require('./configs/socket').init(server);
+require('./lib/socketHandler');
