@@ -77,7 +77,7 @@ const logoutUser = async (req, res, next) => {
     res.status(200).json({ result: 'ok' });
   } catch (err) {
     console.log(err);
-    return res.status(500).json({ result: 'error', message: err.message });
+    next(err);
   }
 };
 
