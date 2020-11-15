@@ -83,7 +83,7 @@ const getFriendList = async (req, res, next) => {
   const { user_id } = req.params;
 
   try {
-    const user = await User.findById(user_id);
+    const user = await User.findById(user_id).populate('friendList');
 
     res.status(200).json({ result: 'ok', friendList: user.friendList });
   } catch (err) {
