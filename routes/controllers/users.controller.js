@@ -146,6 +146,8 @@ const responseFriendRequest = async (req, res, next) => {
     if (isAccepted) {
       user.friendList.push(target_user_id);
       targetUser.friendList.push(user_id);
+
+      await targetUser.save();
     }
 
     user.friendRequestList.pull(target_user_id);
