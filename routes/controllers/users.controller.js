@@ -66,10 +66,10 @@ const tokenLogin = (req, res, next) => {
 };
 
 const logoutUser = async (req, res, next) => {
-  const { user_Id } = req.params;
+  const { user_id } = req.params;
 
   try {
-    const currentUser = await User.findById(user_Id);
+    const currentUser = await User.findById(user_id);
 
     currentUser.isOnline = false;
     await currentUser.save();
