@@ -8,12 +8,12 @@ exports.verifyToken = (req, res, next) => {
 
   try {
     const decodedUser = jwt.verify(token, tokenSecretKey);
-    console.log(decodedUser.id, user_id);
-    if (decodedUser.id !== user_id) {
+    if (decodedUser._id !== user_id) {
       return res.status(403).json({ result: 'error', error: 'Mismatch user id' });
     }
     next();
   } catch (err) {
+    console.log('err', err);
     res.status(401).json({ result: 'error', error: err.message });
   }
 };
