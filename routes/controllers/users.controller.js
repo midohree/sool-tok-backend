@@ -22,7 +22,7 @@ const googleLogin = async (req, res, next) => {
       });
 
       const token = jwt.sign({
-        id: newUser._id,
+        _id: newUser._id,
         email: newUser.email,
         name: newUser.name,
         photoUrl: newUser.photoUrl,
@@ -35,7 +35,7 @@ const googleLogin = async (req, res, next) => {
     await targetUser.save();
 
     const token = jwt.sign({
-      id: targetUser._id,
+      _id: targetUser._id,
       email: targetUser.email,
       name: targetUser.name,
       photoUrl: targetUser.photoUrl,
@@ -51,9 +51,7 @@ const googleLogin = async (req, res, next) => {
 const tokenLogin = (req, res, next) => {
   const { token } = req.body;
 
-  if (!token) {
-    return res.status(400).json({ result: 'error', message: 'Bad request' });
-  }
+  if (!token) return res.status(400).json({ result: 'error', message: 'Bad request' });
 
   try {
     const decodedUser = jwt.verify(token, tokenSecretKey);
@@ -112,14 +110,19 @@ const requestFriend = async (req, res, next) => {
   try {
     const targetUser = await User.findOne({ email: targetUserEmail });
 
-    if (!targetUser) {
-      return res.status(204).json({ result: 'error', message: 'No content' });
+    if (!targetUser) return res.status(204).end();
+
+    const addedUser = targetUser.friendRequestList.addToSet(user_id);
+
+    if (!addedUser.length) {
+      return res
+        .status(200)
+        .json({ result: 'ok', message: `${targetUser.name}님에게 이미 친구 요청을 보냈습니다.` });
     }
 
-    targetUser.friendRequestList.push(user_id);
     await targetUser.save();
 
-    res.status(200).json({ result: 'ok', friendRequestList: targetUser.friendRequestList });
+    res.status(200).json({ result: 'ok', message: `${targetUser.name}님에게 친구 요청을 보냈습니다.` });
   } catch (err) {
     next(err);
   }
@@ -127,12 +130,12 @@ const requestFriend = async (req, res, next) => {
 
 const responseFriendRequest = async (req, res, next) => {
   const { user_id } = req.params;
-  const { action, target_user_id } = req.body;
+  const { isAccepted, target_user_id } = req.body;
 
   try {
     const user = await User.findById(user_id);
 
-    if (action === 'accept') {
+    if (isAccepted) {
       user.friendList.push(target_user_id);
     }
 
